@@ -1,39 +1,31 @@
-import cors from "cors";
 import "dotenv/config";
-import dotenv from "dotenv"
 import express, { Express } from "express";
 import { createServer } from "http";
+import cors from "cors";
 import { databaseConnect } from "./config/database";
-import customerRoutes from "./routes/customer"
+const mongoose = require("mongoose");
+import customerRoutes from "./routes/customer";
 
-dotenv.config();
+mongoose.set("strictQuery", false);
 
-dotenv.config({
-  path: `.env`,
-  override: true,
-});
-
-// INITIALIZING EXPRESS
+// INITIALIZING EXPREESS
 const app: Express = express();
 const server = createServer(app);
 const port = process.env.PORT;
 app.use(cors());
-
-// Connected to database
 databaseConnect();
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-//get api 
-app.get("/", (req, res) => {
-    res.status(200).json({sucess:true, message: "API is working.."})
+// PORT LISTEN
+server.listen(port, () => {
+  console.log(`Server Runnig http://localhost:${port}`);
 });
 
-// Routes
-app.use("/api/customer", customerRoutes)
+//ROUTES
+app.get("/", (req, res) => {
+  res.status(200).json({ name: "Api Worked Fine" });
+});
 
-//POST listen
-server.listen(port, () => {
-    console.log(`Server Running http://localhost:${port}`);
-})
-
+// Customer Routes
+app.use("/api/customer", customerRoutes);
